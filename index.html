@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🧠 Braindump Dashboard</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { margin: 0; font-family: 'Segoe UI', sans-serif; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #b8dde8; border-radius: 3px; }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+const { useState } = React;
+
+const initialTodos = [
+  { id: 1, text: "API-Key in Ninox finden & kopieren", done: false, tag: "Ninox" },
+  { id: 2, text: "Erste GET-Anfrage an Ninox testen", done: false, tag: "Ninox" },
+  { id: 3, text: "Tabellen-Struktur in Ninox definieren", done: false, tag: "Ninox" },
+  { id: 4, text: "Make.com Account einrichten", done: false, tag: "Make" },
+  { id: 5, text: "iCloud Speicher aufräumen (Fotos & Backups)", done: false, tag: "Privat" },
+  { id: 6, text: "GORILLA Farben-PDF finalisieren", done: false, tag: "GORILLA" },
+  { id: 7, text: "Markenwissen Guide aktualisieren", done: false, tag: "GORILLA" },
+  { id: 8, text: "Workflow bauen: Whisper herunterladen", done: false, tag: "Workflow" },
+  { id: 9, text: "Workflow mit Whisper aufbauen", done: false, tag: "Workflow" },
+  { id: 10, text: "Sticky Notes in Figma aufbauen (gedankliche Schritte)", done: false, tag: "Workflow" },
+  { id: 11, text: "Meeting mit Yannik – Workflow durchgehen", done: true, tag: "Workflow" },
+  { id: 12, text: "Quiz 1 machen", done: false, tag: "Lernen" },
+  { id: 13, text: "Quiz 2 machen", done: false, tag: "Lernen" },
+  { id: 14, text: "Videos anschauen: Freestyle Fußball (Lehrkräftefortbildung)", done: false, tag: "Schule" },
+  { id: 15, text: "Brain Kinetic: nächsten Buchstaben machen", done: false, tag: "Schule" },
+  { id: 16, text: "Berechtigung von Mac Consult: Zugriff auf Microsoft 365 (alle Anwendungen)", done: false, tag: "IT" },
+  { id: 17, text: "MIND (Webhoster): Freigabe für Plugins – Rücksprache mit Pia & Martin", done: false, tag: "IT" },
+  { id: 18, text: "Claude-Account klären – Absprache mit Julez", done: false, tag: "IT" },
+  { id: 19, text: "Workflow für Meetingprotokolle weiterentwickeln", done: false, tag: "Workflow" },
+  { id: 20, text: "Klären: Neues MacBook mit mehr RAM & Leistung", done: false, tag: "IT" },
+];
+
+const quickLinks = [
+  { label: "Ninox", url: "https://ninox.com", emoji: "🗄️" },
+  { label: "Make.com", url: "https://make.com", emoji: "⚙️" },
+  { label: "iCloud", url: "https://icloud.com", emoji: "☁️" },
+  { label: "GORILLA", url: "#", emoji: "🦍" },
+];
+
+const tagColors = {
+  Ninox: { bg: "#dbeafe", color: "#1d4ed8" },
+  Make: { bg: "#ede9fe", color: "#7c3aed" },
+  Privat: { bg: "#fef9c3", color: "#b45309" },
+  GORILLA: { bg: "#dcfce7", color: "#15803d" },
+  Workflow: { bg: "#ffedd5", color: "#c2410c" },
+  Lernen: { bg: "#fce7f3", color: "#be185d" },
+  Schule: { bg: "#ccfbf1", color: "#0f766e" },
+  IT: { bg: "#f1f5f9", color: "#475569" },
+};
+
+const notes = [
+  { title: "API Grundlagen", body: "REST · GET / POST / PUT / DELETE · JSON · Bearer Token", emoji: "🔌" },
+  { title: "iCloud Speicher", body: "Größte Fresser: Fotos, Backups, Nachrichten-Anhänge.\nZuerst: 'Zuletzt gelöscht' leeren!", emoji: "☁️" },
+  { title: "GORILLA Infos", body: "🎨 Farben: Grün #78b41e · Rot #e30023 · Gelb #ffdd0c · Purpur #c03281\n📝 Typografie: Hausschrift Montserrat, Headlines fett\n🦍 Markenguide: GORILLA_Corporate_Design.pdf\n🔗 Alle GORILLA-Dokumente im Braindump gespeichert", emoji: "🦍" },
+];
+
+const card = {
+  background: 'rgba(255,255,255,0.6)',
+  backdropFilter: 'blur(12px)',
+  borderRadius: '1rem',
+  border: '1px solid rgba(255,255,255,0.75)',
+  boxShadow: '0 4px 24px rgba(44,95,110,0.09)',
+  padding: '1.25rem',
+};
+
+function Dashboard() {
+  const [todos, setTodos] = useState(initialTodos);
+  const [newTodo, setNewTodo] = useState("");
+  const [newTag, setNewTag] = useState("Privat");
+  const [activeFilter, setActiveFilter] = useState("Alle");
+  const [expandedNote, setExpandedNote] = useState(null);
+  const time = new Date().toLocaleDateString("de-DE", { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
+
+  const toggleTodo = (id) => setTodos(todos.map(t => t.id === id ? { ...t, done: !t.done } : t));
+  const deleteTodo = (id) => setTodos(todos.filter(t => t.id !== id));
+  const addTodo = () => {
+    if (!newTodo.trim()) return;
+    setTodos([...todos, { id: Date.now(), text: newTodo, done: false, tag: newTag }]);
+    setNewTodo("");
+  };
+
+  const tags = ["Alle", ...Object.keys(tagColors)];
+  const filtered = activeFilter === "Alle" ? todos : todos.filter(t => t.tag === activeFilter);
+  const done = todos.filter(t => t.done).length;
+  const progress = todos.length ? Math.round((done / todos.length) * 100) : 0;
+
+  return (
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #f0ede6 0%, #dff0f5 40%, #b8e0ea 70%, #e8f5e0 100%)', padding: '1.5rem', fontFamily: 'Segoe UI, sans-serif' }}>
+
+      <div style={{ marginBottom: '2rem' }}>
+        <p style={{ color: '#7a9eaa', fontSize: '0.85rem', marginBottom: '0.25rem' }}>🌴 {time}</p>
+        <h1 style={{ color: '#2c5f6e', fontSize: '1.9rem', fontWeight: 700, margin: 0 }}>🧠 Braindump Dashboard</h1>
+        <p style={{ color: '#7a9eaa', marginTop: '0.25rem', fontSize: '0.9rem' }}>Dein persönlicher Überblick — alles auf einen Blick.</p>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.25rem' }}>
+
+        {/* To-Dos */}
+        <div style={{ ...card, gridColumn: 'span 2' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+            <h2 style={{ color: '#2c5f6e', fontWeight: 600, fontSize: '1.05rem', margin: 0 }}>✅ To-Dos</h2>
+            <span style={{ color: '#7a9eaa', fontSize: '0.8rem' }}>{done}/{todos.length} erledigt</span>
+          </div>
+          <div style={{ background: 'rgba(44,95,110,0.1)', borderRadius: '9999px', height: '8px', marginBottom: '0.75rem' }}>
+            <div style={{ background: 'linear-gradient(90deg,#5bbfd4,#78c87a)', height: '8px', borderRadius: '9999px', width: `${progress}%`, transition: 'width 0.5s' }} />
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '0.75rem' }}>
+            {tags.map(tag => (
+              <button key={tag} onClick={() => setActiveFilter(tag)}
+                style={{ fontSize: '0.72rem', padding: '0.2rem 0.7rem', borderRadius: '9999px', border: '1px solid', cursor: 'pointer', transition: 'all 0.2s',
+                  background: activeFilter === tag ? '#2c5f6e' : 'transparent',
+                  color: activeFilter === tag ? '#fff' : '#7a9eaa',
+                  borderColor: activeFilter === tag ? '#2c5f6e' : '#b8dde8' }}>
+                {tag}
+              </button>
+            ))}
+          </div>
+          <div style={{ maxHeight: '300px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.4rem', marginBottom: '0.75rem' }}>
+            {filtered.map(todo => (
+              <div key={todo.id} style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', background: 'rgba(255,255,255,0.55)', border: '1px solid rgba(255,255,255,0.7)', borderRadius: '0.75rem', padding: '0.55rem 0.9rem' }}>
+                <input type="checkbox" checked={todo.done} onChange={() => toggleTodo(todo.id)} style={{ accentColor: '#5bbfd4', width: '16px', height: '16px', cursor: 'pointer' }} />
+                <span style={{ flex: 1, fontSize: '0.85rem', color: todo.done ? '#aac8d0' : '#2c5f6e', textDecoration: todo.done ? 'line-through' : 'none' }}>{todo.text}</span>
+                <span style={{ fontSize: '0.7rem', padding: '0.1rem 0.5rem', borderRadius: '9999px', background: tagColors[todo.tag]?.bg || '#eee', color: tagColors[todo.tag]?.color || '#555' }}>{todo.tag}</span>
+                <button onClick={() => deleteTodo(todo.id)} style={{ color: '#e07070', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.8rem' }}>✕</button>
+              </div>
+            ))}
+          </div>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <input type="text" value={newTodo} onChange={e => setNewTodo(e.target.value)} onKeyDown={e => e.key === 'Enter' && addTodo()} placeholder="Neue Aufgabe..."
+              style={{ flex: 1, borderRadius: '0.75rem', padding: '0.5rem 0.9rem', fontSize: '0.85rem', border: '1px solid #b8dde8', background: 'rgba(255,255,255,0.7)', color: '#2c5f6e', outline: 'none' }} />
+            <select value={newTag} onChange={e => setNewTag(e.target.value)}
+              style={{ borderRadius: '0.75rem', padding: '0.5rem 0.6rem', fontSize: '0.85rem', border: '1px solid #b8dde8', background: 'rgba(255,255,255,0.7)', color: '#2c5f6e', outline: 'none' }}>
+              {Object.keys(tagColors).map(t => <option key={t}>{t}</option>)}
+            </select>
+            <button onClick={addTodo} style={{ background: 'linear-gradient(135deg,#5bbfd4,#78c87a)', color: '#fff', border: 'none', borderRadius: '0.75rem', padding: '0.5rem 1rem', fontWeight: 600, cursor: 'pointer', fontSize: '1rem' }}>+</button>
+          </div>
+        </div>
+
+        {/* Right column */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <div style={card}>
+            <h2 style={{ color: '#2c5f6e', fontWeight: 600, fontSize: '1.05rem', marginTop: 0, marginBottom: '0.75rem' }}>🔗 Quick Links</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+              {quickLinks.map(link => (
+                <a key={link.label} href={link.url} target="_blank" rel="noreferrer"
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(91,191,212,0.12)', border: '1px solid rgba(91,191,212,0.25)', borderRadius: '0.75rem', padding: '0.6rem 0.75rem', fontSize: '0.85rem', color: '#2c5f6e', textDecoration: 'none' }}>
+                  <span>{link.emoji}</span><span>{link.label}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+          <div style={card}>
+            <h2 style={{ color: '#2c5f6e', fontWeight: 600, fontSize: '1.05rem', marginTop: 0, marginBottom: '0.75rem' }}>📊 Status</h2>
+            {Object.keys(tagColors).map(tag => {
+              const count = todos.filter(t => t.tag === tag).length;
+              const doneCount = todos.filter(t => t.tag === tag && t.done).length;
+              return (
+                <div key={tag} style={{ marginBottom: '0.6rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#7a9eaa', marginBottom: '0.2rem' }}>
+                    <span>{tag}</span><span>{doneCount}/{count}</span>
+                  </div>
+                  <div style={{ background: 'rgba(44,95,110,0.1)', borderRadius: '9999px', height: '6px' }}>
+                    <div style={{ background: 'linear-gradient(90deg,#5bbfd4,#78c87a)', height: '6px', borderRadius: '9999px', width: count > 0 ? `${Math.round((doneCount/count)*100)}%` : '0%', transition: 'width 0.5s' }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Notes – full width */}
+        <div style={{ ...card, gridColumn: '1 / -1' }}>
+          <h2 style={{ color: '#2c5f6e', fontWeight: 600, fontSize: '1.05rem', marginTop: 0, marginBottom: '0.75rem' }}>📝 Gespeichertes Wissen</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
+            {notes.map((note, i) => (
+              <div key={i} onClick={() => setExpandedNote(expandedNote === i ? null : i)}
+                style={{ background: 'rgba(91,191,212,0.08)', border: '1px solid rgba(91,191,212,0.25)', borderRadius: '0.75rem', padding: '0.85rem', cursor: 'pointer' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.3rem' }}>
+                  <span style={{ fontSize: '1.25rem' }}>{note.emoji}</span>
+                  <span style={{ fontWeight: 600, fontSize: '0.88rem', color: '#2c5f6e' }}>{note.title}</span>
+                </div>
+                {expandedNote === i
+                  ? <p style={{ color: '#5a8090', fontSize: '0.78rem', lineHeight: 1.6, margin: 0, whiteSpace: 'pre-line', borderTop: '1px solid rgba(91,191,212,0.3)', paddingTop: '0.5rem' }}>{note.body}</p>
+                  : <p style={{ color: '#aac8d0', fontSize: '0.75rem', margin: 0 }}>Klicken zum Öffnen →</p>
+                }
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<Dashboard />);
+</script>
+</body>
+</html>
