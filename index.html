@@ -7,174 +7,656 @@
   <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body { margin: 0; font-family: 'Segoe UI', sans-serif; }
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #b8dde8; border-radius: 3px; }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:linear-gradient(160deg,#f0ede6 0%,#dff0f5 40%,#b8e0ea 70%,#e8f5e0 100%);min-height:100vh;color:#2c5f6e}
+    ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-thumb{background:#b8dde8;border-radius:3px}
+    a{color:inherit;text-decoration:none}
   </style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
-
 const { useState } = React;
 
+/* ─── DATA ─────────────────────────────────────────────── */
 const initialTodos = [
-  { id: 1, text: "API-Key in Ninox finden & kopieren", done: false, tag: "Ninox" },
-  { id: 2, text: "Erste GET-Anfrage an Ninox testen", done: false, tag: "Ninox" },
-  { id: 3, text: "Tabellen-Struktur in Ninox definieren", done: false, tag: "Ninox" },
-  { id: 4, text: "Make.com Account einrichten", done: false, tag: "Make" },
-  { id: 5, text: "iCloud Speicher aufräumen (Fotos & Backups)", done: false, tag: "Privat" },
-  { id: 6, text: "GORILLA Farben-PDF finalisieren", done: false, tag: "GORILLA" },
-  { id: 7, text: "Markenwissen Guide aktualisieren", done: false, tag: "GORILLA" },
-  { id: 8, text: "Workflow bauen: Whisper herunterladen", done: false, tag: "Workflow" },
-  { id: 9, text: "Workflow mit Whisper aufbauen", done: false, tag: "Workflow" },
-  { id: 10, text: "Sticky Notes in Figma aufbauen (gedankliche Schritte)", done: false, tag: "Workflow" },
-  { id: 11, text: "Meeting mit Yannik – Workflow durchgehen", done: true, tag: "Workflow" },
-  { id: 12, text: "Quiz 1 machen", done: false, tag: "Lernen" },
-  { id: 13, text: "Quiz 2 machen", done: false, tag: "Lernen" },
-  { id: 14, text: "Videos anschauen: Freestyle Fußball (Lehrkräftefortbildung)", done: false, tag: "Schule" },
-  { id: 15, text: "Brain Kinetic: nächsten Buchstaben machen", done: false, tag: "Schule" },
-  { id: 16, text: "Berechtigung von Mac Consult: Zugriff auf Microsoft 365 (alle Anwendungen)", done: false, tag: "IT" },
-  { id: 17, text: "MIND (Webhoster): Freigabe für Plugins – Rücksprache mit Pia & Martin", done: false, tag: "IT" },
-  { id: 18, text: "Claude-Account klären – Absprache mit Julez", done: false, tag: "IT" },
-  { id: 19, text: "Workflow für Meetingprotokolle weiterentwickeln", done: false, tag: "Workflow" },
-  { id: 20, text: "Klären: Neues MacBook mit mehr RAM & Leistung", done: false, tag: "IT" },
-];
-
-const quickLinks = [
-  { label: "Ninox", url: "https://ninox.com", emoji: "🗄️" },
-  { label: "Make.com", url: "https://make.com", emoji: "⚙️" },
-  { label: "iCloud", url: "https://icloud.com", emoji: "☁️" },
-  { label: "GORILLA", url: "#", emoji: "🦍" },
+  { id:1,  text:"API-Key in Ninox finden & kopieren",                                   done:false, tag:"Ninox"    },
+  { id:2,  text:"Erste GET-Anfrage an Ninox testen",                                    done:false, tag:"Ninox"    },
+  { id:3,  text:"Tabellen-Struktur in Ninox definieren",                                done:false, tag:"Ninox"    },
+  { id:4,  text:"Make.com Account einrichten",                                          done:false, tag:"Make"     },
+  { id:5,  text:"iCloud Speicher aufräumen (Fotos & Backups)",                          done:false, tag:"Privat"   },
+  { id:6,  text:"GORILLA Farben-PDF finalisieren",                                      done:false, tag:"GORILLA"  },
+  { id:7,  text:"Markenwissen Guide aktualisieren",                                     done:false, tag:"GORILLA"  },
+  { id:8,  text:"Workflow bauen: Whisper herunterladen",                                done:false, tag:"Workflow" },
+  { id:9,  text:"Workflow mit Whisper aufbauen",                                        done:false, tag:"Workflow" },
+  { id:10, text:"Sticky Notes in Figma aufbauen (gedankliche Schritte)",               done:false, tag:"Workflow" },
+  { id:11, text:"Meeting mit Yannik – Workflow durchgehen",                             done:true,  tag:"Workflow" },
+  { id:12, text:"Quiz 1 machen",                                                        done:false, tag:"Lernen"   },
+  { id:13, text:"Quiz 2 machen",                                                        done:false, tag:"Lernen"   },
+  { id:14, text:"Videos anschauen: Freestyle Fußball (Lehrkräftefortbildung)",         done:false, tag:"Schule"   },
+  { id:15, text:"Brain Kinetic: nächsten Buchstaben machen",                           done:false, tag:"Schule"   },
+  { id:16, text:"Berechtigung von Mac Consult: Zugriff auf Microsoft 365 (alle Apps)", done:false, tag:"IT"       },
+  { id:17, text:"MIND (Webhoster): Freigabe für Plugins – Rücksprache Pia & Martin",  done:false, tag:"IT"       },
+  { id:18, text:"Claude-Account klären – Absprache mit Julez",                         done:false, tag:"IT"       },
+  { id:19, text:"Workflow für Meetingprotokolle weiterentwickeln",                     done:false, tag:"Workflow" },
+  { id:20, text:"Klären: Neues MacBook mit mehr RAM & Leistung",                       done:false, tag:"IT"       },
 ];
 
 const tagColors = {
-  Ninox: { bg: "#dbeafe", color: "#1d4ed8" },
-  Make: { bg: "#ede9fe", color: "#7c3aed" },
-  Privat: { bg: "#fef9c3", color: "#b45309" },
-  GORILLA: { bg: "#dcfce7", color: "#15803d" },
-  Workflow: { bg: "#ffedd5", color: "#c2410c" },
-  Lernen: { bg: "#fce7f3", color: "#be185d" },
-  Schule: { bg: "#ccfbf1", color: "#0f766e" },
-  IT: { bg: "#f1f5f9", color: "#475569" },
+  Ninox:    {bg:"#dbeafe",color:"#1d4ed8"},
+  Make:     {bg:"#ede9fe",color:"#7c3aed"},
+  Privat:   {bg:"#fef9c3",color:"#b45309"},
+  GORILLA:  {bg:"#dcfce7",color:"#15803d"},
+  Workflow: {bg:"#ffedd5",color:"#c2410c"},
+  Lernen:   {bg:"#fce7f3",color:"#be185d"},
+  Schule:   {bg:"#ccfbf1",color:"#0f766e"},
+  IT:       {bg:"#f1f5f9",color:"#475569"},
 };
 
-const notes = [
-  { title: "API Grundlagen", body: "REST · GET / POST / PUT / DELETE · JSON · Bearer Token", emoji: "🔌" },
-  { title: "iCloud Speicher", body: "Größte Fresser: Fotos, Backups, Nachrichten-Anhänge.\nZuerst: 'Zuletzt gelöscht' leeren!", emoji: "☁️" },
-  { title: "GORILLA Infos", body: "🎨 Farben: Grün #78b41e · Rot #e30023 · Gelb #ffdd0c · Purpur #c03281\n📝 Typografie: Hausschrift Montserrat, Headlines fett\n🦍 Markenguide: GORILLA_Corporate_Design.pdf\n🔗 Alle GORILLA-Dokumente im Braindump gespeichert", emoji: "🦍" },
+const quickLinks = [
+  {label:"Ninox",      url:"https://ninox.com",        emoji:"🗄️"},
+  {label:"Make.com",   url:"https://make.com",          emoji:"⚙️"},
+  {label:"iCloud",     url:"https://icloud.com",        emoji:"☁️"},
+  {label:"GitHub",     url:"https://github.com/qualinga/Braindump", emoji:"🐙"},
+  {label:"Claude",     url:"https://claude.ai",         emoji:"🤖"},
+  {label:"Figma",      url:"https://figma.com",         emoji:"🎨"},
+  {label:"GORILLA",    url:"https://gorilla.de",        emoji:"🦍"},
+  {label:"Langdock",   url:"https://app.langdock.com",  emoji:"🧠"},
 ];
 
+/* ─── MENU SECTIONS ─────────────────────────────────────── */
+const menuSections = [
+  {
+    id:"ki",
+    icon:"🤖",
+    label:"KI-Leader",
+    color:"#c2410c",
+    bg:"#ffedd5",
+    content: [
+      {
+        title:"Whisper – Meeting-Workflow",
+        body:`Ziel: Automatische Transkription von Meetings mit Whisper (OpenAI).
+
+Schritte:
+1. Whisper lokal installieren (openai-whisper via pip)
+2. Audio-Datei aufnehmen (z. B. mit iPhone oder Mac)
+3. Whisper transkribiert → Text-Output
+4. Text via Make.com oder n8n weiterverarbeiten
+5. KI (Claude/ChatGPT) fasst Protokoll zusammen
+6. Output → Ninox oder Notion speichern
+
+Figma Sticky Notes: Gedankliche Schritte des Workflows visualisieren, bevor er gebaut wird.`
+      },
+      {
+        title:"Meetingprotokoll-Workflow",
+        body:`Aktueller Stand: In Entwicklung
+
+Ziel: Vollautomatisches Protokoll nach jedem Meeting.
+
+Geplante Kette:
+Aufnahme → Whisper (Transkript) → Claude (Zusammenfassung + To-Dos) → Ninox (Ablage) → E-Mail ans Team
+
+Tools: Whisper · Claude API · Make.com · Ninox
+Nächster Schritt: Workflow-Schritte in Figma Sticky Notes festhalten`
+      },
+      {
+        title:"API Grundlagen",
+        body:`Was ist eine API?
+→ Schnittstelle, die zwei Systeme miteinander verbinden lässt.
+
+Wichtige Konzepte:
+• REST API – Standardformat für Web-APIs
+• Methoden: GET (lesen) · POST (erstellen) · PUT (aktualisieren) · DELETE (löschen)
+• Format: JSON (JavaScript Object Notation)
+• Authentifizierung: Bearer Token / API Key im Header
+
+Beispiel Header:
+Authorization: Bearer DEIN_API_KEY
+Content-Type: application/json
+
+Ninox API Base-URL:
+https://api.ninox.com/v1/teams/{teamId}/databases/{dbId}/tables/{tableId}/records`
+      },
+      {
+        title:"Claude & KI-Tools",
+        body:`Claude (Anthropic):
+→ Account klären mit Julez
+→ claude.ai (Browser) oder Claude API für Automatisierungen
+→ Stärke: Lange Texte, Analysen, Protokolle, Prompts
+
+ChatGPT (OpenAI):
+→ openai.com/chatgpt
+→ Whisper = OpenAI-Modell für Spracherkennung
+
+Make.com:
+→ Automatisierungsplattform (wie Zapier, aber mächtiger)
+→ Verbindet: Ninox ↔ Claude ↔ E-Mail ↔ Kalender etc.
+
+Langdock:
+→ Unternehmenslösung für KI-Assistenten
+→ Wissensbasis + DSGVO-konform`
+      },
+    ]
+  },
+  {
+    id:"gorilla",
+    icon:"🦍",
+    label:"GORILLA",
+    color:"#15803d",
+    bg:"#dcfce7",
+    content: [
+      {
+        title:"Was ist GORILLA?",
+        body:`GORILLA ist ein mehrfach ausgezeichnetes Gesundheitsförderungs- und Bildungsprogramm für Kinder, Jugendliche und junge Erwachsene (gGmbH, Deutschland).
+
+Mission: Freestyle-Sport trifft Gesundheitsbildung. Eigenverantwortung, Selbstinitiative und ausgewogener Umgang mit Körper, Geist und Umwelt.
+
+Slogan: „Let's GO GORILLA" · „Für eine gesunde Jugend!"
+
+4 Kernthemen (immer in VERSALIEN):
+• ACTION – Bewegung & Freestyle-Sport
+• FOOD – Ernährungsbildung
+• GREEN – Nachhaltigkeit & Umwelt
+• BALANCE – Mentale Gesundheit
+
+Relevanz: Jedes 5. Kind in Deutschland ist übergewichtig (3,5 Mio. unter 18 Jahren). Falsche Ernährung & Bewegungsmangel sind Hauptursachen.`
+      },
+      {
+        title:"Programme & Kampagnen",
+        body:`Schulprogramm:
+• Tutorials für ACTION, FOOD, GREEN & BALANCE
+• Online-Bildungsplattform + Offline-Unterrichtsmaterialien
+• Lektionen, Lehrmittel, Tages- und Follow-Up-Workshops
+
+Kampagnen & Events:
+• GORILLA Day & Workshops
+• GORILLA Playground
+• GORILLA Powergame
+• GORILLA GO TIME:R
+• GORILLA Academy (Coach-Ausbildung)
+• GORILLA Partizipationskonzept
+
+Evaluation 2019:
+→ 79 % haben sich neue Skills angeeignet (Freestyle + Lebenskompetenzen)
+→ Empowerment ist bei jungen Menschen gewachsen`
+      },
+      {
+        title:"Markenfarben – Dachmarke",
+        body:`Stand: April 2026
+
+Hauptfarben Dachmarke:
+🟢 Grün (Leitfarbe)  #78B41E  RGB 120/180/30
+⚫ Schwarz            #111111  RGB 0/0/0
+⬜ Hellgrau           #F2F2F2  RGB 243/243/243
+⬜ Weiß               #FFFFFF  RGB 255/255/255
+
+Sub-Label Farben:
+🔴 ACTION  #E30023  Rot
+🟡 FOOD    #FFDD0C  Gelb
+🟢 GREEN   #78B41E  Grün (= Dachmarke)
+🟣 BALANCE #C03281  Purpur
+
+Saisonfarben (Auswahl):
+Januar  #5EAEE4 · Februar #548F9F
+März    #97A165 · April   #6A9F4C`
+      },
+      {
+        title:"Corporate Wording & CI",
+        body:`Schreibweise:
+• GORILLA → immer in VERSALIEN
+• Kernthemen alleinstehend: ACTION · FOOD · GREEN · BALANCE
+• Slogan: „Let's GO GORILLA" (GO immer groß)
+
+Hashtags:
+#letsGOgorilla · #letsGObalance · #meetthebeefamily
+
+Unterschiede DE / AT (Auswahl):
+DE: Aubergine → AT: Melanzani
+DE: Aprikosen  → AT: Marillen
+DE: Blaukraut  → AT: Blaukraut (Beatbox-Blau-Crowd)
+
+Kanäle: Website · Social Media · Newsletter · Marketingmaterialien · Interne Kommunikation
+
+Ziel Corporate Wording: Konsistenz über alle Kanäle hinweg (Stand: 26.08.24)`
+      },
+      {
+        title:"Typografie & Logos",
+        body:`Hausschrift: Montserrat
+• Headlines: Montserrat Bold / ExtraBold
+• Fließtext: Montserrat Regular / Light
+• Akzente: Montserrat Italic
+
+Logo-Regeln:
+• GORILLA-Logo immer in Vollversion (kein beschnittenes Logo)
+• Schutzzone um das Logo einhalten
+• Auf dunklem Hintergrund: Logo in Weiß
+• Auf hellem Hintergrund: Logo in Grün (#78B41E) oder Schwarz
+
+Dateiformate:
+• Print: PDF / EPS / CMYK
+• Digital: SVG / PNG / RGB
+• Word-Dokumente: PNG mit transparentem Hintergrund`
+      },
+      {
+        title:"Wirkungslogik",
+        body:`GORILLA Masterplan – Wirkungslogik:
+
+Zielgruppen:
+• Kinder & Jugendliche (Primär)
+• Eltern, Pädagog:innen, Partner:innen
+• Breite Öffentlichkeit
+
+Wirkungsziele:
+• Förderung körperlicher & mentaler Gesundheit
+• Senkung der Gesundheitskosten
+• Steigerung sozialer Mobilität
+• Nachhaltiges Konsumverhalten
+• Empowerment junger Menschen
+
+Gesellschaftlicher Impact:
+• Positiver Einfluss in Familien & Umfeld
+• Wirkungs- und zielgruppenorientiertes Lehrangebot etabliert`
+      },
+    ]
+  },
+  {
+    id:"it",
+    icon:"💻",
+    label:"IT & Tools",
+    color:"#475569",
+    bg:"#f1f5f9",
+    content: [
+      {
+        title:"Mac Consult – Microsoft 365",
+        body:`Aufgabe: Berechtigung für Microsoft 365 (alle Anwendungen) anfordern.
+
+Kontakt: Mac Consult (IT-Dienstleister)
+Benötigte Apps: Word · Excel · PowerPoint · Teams · Outlook · OneDrive · SharePoint
+
+Vorgehen:
+1. Anfrage an Mac Consult stellen (IT-Ticket oder direkte Kontaktperson)
+2. Begründung: Arbeitsrelevant für Dokumentenbearbeitung & Kommunikation
+3. Lizenztyp klären: Business Basic / Standard / Premium?
+4. Aktivierung & Einrichtung bestätigen lassen`
+      },
+      {
+        title:"MIND – Webhoster & Plugins",
+        body:`MIND = Webhoster von GORILLA Deutschland
+
+Aufgabe: Freigabe für Plugins erhalten
+
+Rücksprache mit:
+• Pia – interne Abstimmung ob Berechtigung gewünscht
+• Martin – technische/strategische Entscheidung
+
+Fragen zu klären:
+• Welche Plugins werden benötigt? (SEO, Formulare, Performance?)
+• WordPress oder anderes CMS?
+• Soll ich direkt mit MIND Kontakt aufnehmen oder läuft das intern?
+• Wer hat aktuell Admin-Zugriff?`
+      },
+      {
+        title:"Ninox – Datenbank",
+        body:`Ninox = Cloud-Datenbank & Low-Code App-Builder
+
+Verwendungszweck: Interne Datenverwaltung GORILLA
+
+Nächste Schritte:
+1. API-Key in Ninox finden (Settings → API)
+2. Erste GET-Anfrage testen (z. B. via Postman oder Make.com)
+3. Tabellen-Struktur definieren (welche Daten sollen rein?)
+
+API-Basis:
+https://api.ninox.com/v1/teams/{teamId}/databases/{dbId}/tables/{tableId}/records
+
+Authentifizierung: Bearer Token im Header`
+      },
+      {
+        title:"MacBook – Hardware",
+        body:`Aktuelles Problem: Zu wenig RAM, zu langsam für KI-Workflows & Videoproduktion
+
+Anforderungen für neues MacBook:
+• Mindestens 16 GB RAM (besser 32 GB für KI-Tools)
+• Apple Silicon M3 / M4 (schnelle Neural Engine für KI)
+• SSD min. 512 GB
+• Verwendung: Whisper lokal · Figma · Video · Ninox · Make.com
+
+Vorgehen: Mit Vorgesetzten / Verwaltung abstimmen → Budget klären → Mac Consult einbeziehen`
+      },
+      {
+        title:"GitHub – Braindump Website",
+        body:`Repository: github.com/qualinga/Braindump
+Website: qualinga.github.io/Braindump/
+
+Setup:
+• GitHub Pages aktiviert via Settings → Pages → Branch: main
+• Datei: index.html (Braindump Dashboard)
+
+Änderungen vornehmen:
+1. Repository öffnen → index.html anklicken
+2. Bleistift-Symbol (✏️) → Datei bearbeiten
+3. "Commit changes" → Website aktualisiert sich automatisch
+
+Oder: HTML-Datei lokal bearbeiten → hochladen (Upload files)`
+      },
+    ]
+  },
+  {
+    id:"schule",
+    icon:"🏫",
+    label:"Schule & Sport",
+    color:"#0f766e",
+    bg:"#ccfbf1",
+    content: [
+      {
+        title:"Freestyle Fußball – Lehrkräftefortbildung",
+        body:`Aufgabe: Videos anschauen für die Lehrkräftefortbildung
+
+Freestyle Fußball bei GORILLA:
+• Kernbestandteil des ACTION-Programms
+• Verbindet Sport, Kreativität und Jugendkultur
+• Skills: Ball-Jonglage, Tricks, Freestyle-Moves
+
+Für die Fortbildung:
+• Videos dokumentieren welche Moves lehrbar sind
+• Einstiegslevel für Schulklassen definieren
+• Verbindung zu Lehrplan / Gesundheitsförderung herstellen
+• Material für Lehrer:innen aufbereiten`
+      },
+      {
+        title:"Brain Kinetic",
+        body:`Brain Kinetic = Bewegtes Lernen / Gehirn-Körper-Koordination
+
+Aktueller Stand: Nächsten Buchstaben machen
+
+Konzept:
+• Kombination aus Bewegung und kognitivem Lernen
+• Buchstaben werden durch Körperbewegung erlernt/verankert
+• Geeignet für Schulprogramm (BALANCE / ACTION)
+
+Vorgehen: Buchstabe vorbereiten → Übung entwickeln → testen`
+      },
+      {
+        title:"Quiz 1 & Quiz 2",
+        body:`Status: Beide Quizze ausstehend ✋
+
+Details: (bitte ergänzen – welches Thema, welche Plattform?)
+
+Mögliche Tools für Quiz-Erstellung:
+• Mentimeter (mentimeter.com) – Live-Quiz im Unterricht
+• Kahoot (kahoot.com) – Gamification
+• Typeform – Online-Formulare & Quiz
+• Ninox – Interne Auswertung`
+      },
+    ]
+  },
+  {
+    id:"privat",
+    icon:"🔐",
+    label:"Accounts & Privat",
+    color:"#b45309",
+    bg:"#fef9c3",
+    content: [
+      {
+        title:"iCloud – Speicher aufräumen",
+        body:`Problem: iCloud-Speicher voll
+
+Größte Speicherfresser (in dieser Reihenfolge angehen):
+1. 📸 Fotos & Videos → „Zuletzt gelöscht" leeren!
+2. 💾 iPhone/iPad Backups → Einstellungen → Apple ID → iCloud → Backups
+3. 💬 Nachrichten-Anhänge → Einstellungen → Nachrichten → Anhänge verwalten
+4. 📁 iCloud Drive Dateien → cloud.icloud.com → Dateien sortieren
+
+Tipp: Fotos auf externe SSD oder Google Photos (kostenlos bis 15 GB) auslagern.
+
+Ziel: Unter 80 % Auslastung kommen`
+      },
+      {
+        title:"Konto-Übersicht",
+        body:`Aktive Konten (Auswahl):
+🧠 Langdock – KI-Assistent (Braindump)
+🤖 Claude – claude.ai (klären mit Julez)
+🐙 GitHub – github.com/qualinga
+🗄️ Ninox – Datenbank
+⚙️ Make.com – Automatisierung
+☁️ iCloud – Apple Speicher & Backup
+🎨 Figma – Design & Workflows
+🌐 MIND – Webhoster GORILLA
+🖥️ Mac Consult – IT-Dienstleister
+
+Hinweis: Passwörter im Apple Passwörter-Manager oder Bitwarden verwalten.`
+      },
+    ]
+  },
+];
+
+/* ─── STYLES ─────────────────────────────────────────────── */
 const card = {
-  background: 'rgba(255,255,255,0.6)',
-  backdropFilter: 'blur(12px)',
-  borderRadius: '1rem',
-  border: '1px solid rgba(255,255,255,0.75)',
-  boxShadow: '0 4px 24px rgba(44,95,110,0.09)',
-  padding: '1.25rem',
+  background:'rgba(255,255,255,0.62)',
+  backdropFilter:'blur(12px)',
+  borderRadius:'1rem',
+  border:'1px solid rgba(255,255,255,0.78)',
+  boxShadow:'0 4px 24px rgba(44,95,110,0.09)',
+  padding:'1.25rem',
 };
 
+/* ─── COMPONENTS ─────────────────────────────────────────── */
+function BurgerMenu({open, setOpen}) {
+  const [activeSection, setActiveSection] = useState(null);
+
+  return (
+    <>
+      {/* Overlay */}
+      {open && (
+        <div onClick={()=>{setOpen(false);setActiveSection(null)}}
+          style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.25)',zIndex:40,backdropFilter:'blur(2px)'}} />
+      )}
+
+      {/* Sidebar */}
+      <div style={{
+        position:'fixed',top:0,left:0,height:'100vh',width: open ? '340px' : '0',
+        background:'rgba(240,237,230,0.97)',backdropFilter:'blur(20px)',
+        borderRight:'1px solid rgba(255,255,255,0.7)',
+        boxShadow: open ? '4px 0 32px rgba(44,95,110,0.15)' : 'none',
+        transition:'width 0.3s cubic-bezier(.4,0,.2,1)',overflow:'hidden',zIndex:50,
+        display:'flex',flexDirection:'column',
+      }}>
+        <div style={{padding:'1.5rem 1.25rem 1rem',borderBottom:'1px solid rgba(44,95,110,0.1)'}}>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+            <span style={{fontWeight:700,fontSize:'1.1rem',color:'#2c5f6e'}}>🧠 Braindump</span>
+            <button onClick={()=>{setOpen(false);setActiveSection(null)}}
+              style={{background:'none',border:'none',cursor:'pointer',fontSize:'1.3rem',color:'#7a9eaa'}}>✕</button>
+          </div>
+          <p style={{fontSize:'0.75rem',color:'#7a9eaa',marginTop:'0.25rem'}}>Dein Wissensspeicher</p>
+        </div>
+
+        <div style={{flex:1,overflowY:'auto',padding:'0.75rem 0'}}>
+          {menuSections.map(sec => (
+            <div key={sec.id}>
+              <button onClick={()=>setActiveSection(activeSection===sec.id ? null : sec.id)}
+                style={{width:'100%',display:'flex',alignItems:'center',gap:'0.75rem',padding:'0.75rem 1.25rem',
+                  background: activeSection===sec.id ? `${sec.bg}` : 'transparent',
+                  border:'none',cursor:'pointer',textAlign:'left',transition:'background 0.2s'}}>
+                <span style={{fontSize:'1.3rem'}}>{sec.icon}</span>
+                <span style={{fontWeight:600,fontSize:'0.95rem',color: activeSection===sec.id ? sec.color : '#2c5f6e',flex:1}}>{sec.label}</span>
+                <span style={{color:'#7a9eaa',fontSize:'0.8rem'}}>{activeSection===sec.id ? '▲' : '▼'}</span>
+              </button>
+
+              {activeSection===sec.id && (
+                <div style={{paddingBottom:'0.5rem'}}>
+                  {sec.content.map((item,i)=>(
+                    <SubItem key={i} item={item} color={sec.color} bg={sec.bg} />
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div style={{padding:'1rem 1.25rem',borderTop:'1px solid rgba(44,95,110,0.1)',fontSize:'0.72rem',color:'#aac8d0',textAlign:'center'}}>
+          Braindump Dashboard · Stand: April 2026
+        </div>
+      </div>
+    </>
+  );
+}
+
+function SubItem({item, color, bg}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{margin:'0.25rem 0.75rem 0',borderRadius:'0.6rem',border:`1px solid ${color}22`,overflow:'hidden'}}>
+      <button onClick={()=>setOpen(!open)}
+        style={{width:'100%',padding:'0.6rem 0.9rem',display:'flex',justifyContent:'space-between',alignItems:'center',
+          background: open ? bg : 'rgba(255,255,255,0.5)',border:'none',cursor:'pointer',textAlign:'left'}}>
+        <span style={{fontWeight:600,fontSize:'0.82rem',color:'#2c5f6e'}}>{item.title}</span>
+        <span style={{color:'#7a9eaa',fontSize:'0.7rem',flexShrink:0,marginLeft:'0.5rem'}}>{open?'▲':'▼'}</span>
+      </button>
+      {open && (
+        <div style={{padding:'0.75rem 0.9rem',background:'rgba(255,255,255,0.7)',borderTop:`1px solid ${color}22`}}>
+          <pre style={{fontSize:'0.78rem',color:'#4a7080',lineHeight:1.65,whiteSpace:'pre-wrap',fontFamily:'inherit'}}>{item.body}</pre>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─── MAIN DASHBOARD ─────────────────────────────────────── */
 function Dashboard() {
   const [todos, setTodos] = useState(initialTodos);
   const [newTodo, setNewTodo] = useState("");
   const [newTag, setNewTag] = useState("Privat");
   const [activeFilter, setActiveFilter] = useState("Alle");
   const [expandedNote, setExpandedNote] = useState(null);
-  const time = new Date().toLocaleDateString("de-DE", { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
+  const [menuOpen, setMenuOpen] = useState(false);
+  const time = new Date().toLocaleDateString("de-DE", {weekday:"long",day:"2-digit",month:"long",year:"numeric"});
 
-  const toggleTodo = (id) => setTodos(todos.map(t => t.id === id ? { ...t, done: !t.done } : t));
-  const deleteTodo = (id) => setTodos(todos.filter(t => t.id !== id));
+  const toggleTodo = (id) => setTodos(todos.map(t => t.id===id ? {...t,done:!t.done} : t));
+  const deleteTodo = (id) => setTodos(todos.filter(t => t.id!==id));
   const addTodo = () => {
     if (!newTodo.trim()) return;
-    setTodos([...todos, { id: Date.now(), text: newTodo, done: false, tag: newTag }]);
+    setTodos([...todos, {id:Date.now(),text:newTodo,done:false,tag:newTag}]);
     setNewTodo("");
   };
 
-  const tags = ["Alle", ...Object.keys(tagColors)];
-  const filtered = activeFilter === "Alle" ? todos : todos.filter(t => t.tag === activeFilter);
-  const done = todos.filter(t => t.done).length;
-  const progress = todos.length ? Math.round((done / todos.length) * 100) : 0;
+  const tags = ["Alle",...Object.keys(tagColors)];
+  const filtered = activeFilter==="Alle" ? todos : todos.filter(t=>t.tag===activeFilter);
+  const done = todos.filter(t=>t.done).length;
+  const progress = todos.length ? Math.round((done/todos.length)*100) : 0;
+
+  const knowledgeCards = [
+    {title:"iCloud Speicher",emoji:"☁️",body:"Größte Fresser: Fotos, Backups, Anhänge.\n'Zuletzt gelöscht' zuerst leeren! Ziel: unter 80 % Auslastung."},
+    {title:"API Schnellreferenz",emoji:"🔌",body:"REST · GET/POST/PUT/DELETE · JSON · Bearer Token\nNinox: api.ninox.com/v1/teams/{id}/databases/{id}/..."},
+    {title:"GORILLA Marke",emoji:"🦍",body:"Grün #78B41E · Schwarz #111111\nACTION #E30023 · FOOD #FFDD0C · BALANCE #C03281\nSchrift: Montserrat Bold | #letsGOgorilla"},
+  ];
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #f0ede6 0%, #dff0f5 40%, #b8e0ea 70%, #e8f5e0 100%)', padding: '1.5rem', fontFamily: 'Segoe UI, sans-serif' }}>
+    <div style={{minHeight:'100vh',padding:'1.5rem',fontFamily:'inherit'}}>
+      <BurgerMenu open={menuOpen} setOpen={setMenuOpen} />
 
-      <div style={{ marginBottom: '2rem' }}>
-        <p style={{ color: '#7a9eaa', fontSize: '0.85rem', marginBottom: '0.25rem' }}>🌴 {time}</p>
-        <h1 style={{ color: '#2c5f6e', fontSize: '1.9rem', fontWeight: 700, margin: 0 }}>🧠 Braindump Dashboard</h1>
-        <p style={{ color: '#7a9eaa', marginTop: '0.25rem', fontSize: '0.9rem' }}>Dein persönlicher Überblick — alles auf einen Blick.</p>
+      {/* Header */}
+      <div style={{display:'flex',alignItems:'flex-start',gap:'1rem',marginBottom:'2rem'}}>
+        <button onClick={()=>setMenuOpen(true)}
+          style={{background:'rgba(255,255,255,0.7)',border:'1px solid rgba(255,255,255,0.8)',borderRadius:'0.75rem',
+            padding:'0.55rem 0.7rem',cursor:'pointer',fontSize:'1.2rem',lineHeight:1,flexShrink:0,
+            boxShadow:'0 2px 8px rgba(44,95,110,0.1)',marginTop:'0.25rem'}}>
+          ☰
+        </button>
+        <div>
+          <p style={{color:'#7a9eaa',fontSize:'0.85rem',marginBottom:'0.2rem'}}>🌴 {time}</p>
+          <h1 style={{color:'#2c5f6e',fontSize:'1.85rem',fontWeight:700,lineHeight:1.1}}>🧠 Braindump Dashboard</h1>
+          <p style={{color:'#7a9eaa',marginTop:'0.3rem',fontSize:'0.88rem'}}>Dein persönlicher Überblick — alles auf einen Blick.</p>
+        </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.25rem' }}>
+      <div style={{display:'grid',gridTemplateColumns:'2fr 1fr',gap:'1.25rem'}}>
 
         {/* To-Dos */}
-        <div style={{ ...card, gridColumn: 'span 2' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-            <h2 style={{ color: '#2c5f6e', fontWeight: 600, fontSize: '1.05rem', margin: 0 }}>✅ To-Dos</h2>
-            <span style={{ color: '#7a9eaa', fontSize: '0.8rem' }}>{done}/{todos.length} erledigt</span>
+        <div style={card}>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'0.75rem'}}>
+            <h2 style={{color:'#2c5f6e',fontWeight:600,fontSize:'1.05rem'}}>✅ To-Dos</h2>
+            <span style={{color:'#7a9eaa',fontSize:'0.8rem'}}>{done}/{todos.length} erledigt</span>
           </div>
-          <div style={{ background: 'rgba(44,95,110,0.1)', borderRadius: '9999px', height: '8px', marginBottom: '0.75rem' }}>
-            <div style={{ background: 'linear-gradient(90deg,#5bbfd4,#78c87a)', height: '8px', borderRadius: '9999px', width: `${progress}%`, transition: 'width 0.5s' }} />
+
+          <div style={{background:'rgba(44,95,110,0.1)',borderRadius:'9999px',height:'8px',marginBottom:'0.75rem'}}>
+            <div style={{background:'linear-gradient(90deg,#5bbfd4,#78c87a)',height:'8px',borderRadius:'9999px',width:`${progress}%`,transition:'width 0.5s'}} />
           </div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '0.75rem' }}>
-            {tags.map(tag => (
-              <button key={tag} onClick={() => setActiveFilter(tag)}
-                style={{ fontSize: '0.72rem', padding: '0.2rem 0.7rem', borderRadius: '9999px', border: '1px solid', cursor: 'pointer', transition: 'all 0.2s',
-                  background: activeFilter === tag ? '#2c5f6e' : 'transparent',
-                  color: activeFilter === tag ? '#fff' : '#7a9eaa',
-                  borderColor: activeFilter === tag ? '#2c5f6e' : '#b8dde8' }}>
+
+          <div style={{display:'flex',flexWrap:'wrap',gap:'0.4rem',marginBottom:'0.75rem'}}>
+            {tags.map(tag=>(
+              <button key={tag} onClick={()=>setActiveFilter(tag)}
+                style={{fontSize:'0.72rem',padding:'0.2rem 0.7rem',borderRadius:'9999px',border:'1px solid',cursor:'pointer',
+                  background: activeFilter===tag ? '#2c5f6e' : 'transparent',
+                  color: activeFilter===tag ? '#fff' : '#7a9eaa',
+                  borderColor: activeFilter===tag ? '#2c5f6e' : '#b8dde8'}}>
                 {tag}
               </button>
             ))}
           </div>
-          <div style={{ maxHeight: '300px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.4rem', marginBottom: '0.75rem' }}>
-            {filtered.map(todo => (
-              <div key={todo.id} style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', background: 'rgba(255,255,255,0.55)', border: '1px solid rgba(255,255,255,0.7)', borderRadius: '0.75rem', padding: '0.55rem 0.9rem' }}>
-                <input type="checkbox" checked={todo.done} onChange={() => toggleTodo(todo.id)} style={{ accentColor: '#5bbfd4', width: '16px', height: '16px', cursor: 'pointer' }} />
-                <span style={{ flex: 1, fontSize: '0.85rem', color: todo.done ? '#aac8d0' : '#2c5f6e', textDecoration: todo.done ? 'line-through' : 'none' }}>{todo.text}</span>
-                <span style={{ fontSize: '0.7rem', padding: '0.1rem 0.5rem', borderRadius: '9999px', background: tagColors[todo.tag]?.bg || '#eee', color: tagColors[todo.tag]?.color || '#555' }}>{todo.tag}</span>
-                <button onClick={() => deleteTodo(todo.id)} style={{ color: '#e07070', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.8rem' }}>✕</button>
+
+          <div style={{maxHeight:'300px',overflowY:'auto',display:'flex',flexDirection:'column',gap:'0.4rem',marginBottom:'0.75rem'}}>
+            {filtered.map(todo=>(
+              <div key={todo.id} style={{display:'flex',alignItems:'center',gap:'0.6rem',
+                background:'rgba(255,255,255,0.55)',border:'1px solid rgba(255,255,255,0.75)',borderRadius:'0.75rem',padding:'0.55rem 0.9rem'}}>
+                <input type="checkbox" checked={todo.done} onChange={()=>toggleTodo(todo.id)}
+                  style={{accentColor:'#5bbfd4',width:'16px',height:'16px',cursor:'pointer',flexShrink:0}} />
+                <span style={{flex:1,fontSize:'0.85rem',color:todo.done?'#aac8d0':'#2c5f6e',textDecoration:todo.done?'line-through':'none'}}>{todo.text}</span>
+                <span style={{fontSize:'0.7rem',padding:'0.1rem 0.5rem',borderRadius:'9999px',flexShrink:0,
+                  background:tagColors[todo.tag]?.bg||'#eee',color:tagColors[todo.tag]?.color||'#555'}}>{todo.tag}</span>
+                <button onClick={()=>deleteTodo(todo.id)}
+                  style={{color:'#e07070',background:'none',border:'none',cursor:'pointer',fontSize:'0.8rem',flexShrink:0}}>✕</button>
               </div>
             ))}
           </div>
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <input type="text" value={newTodo} onChange={e => setNewTodo(e.target.value)} onKeyDown={e => e.key === 'Enter' && addTodo()} placeholder="Neue Aufgabe..."
-              style={{ flex: 1, borderRadius: '0.75rem', padding: '0.5rem 0.9rem', fontSize: '0.85rem', border: '1px solid #b8dde8', background: 'rgba(255,255,255,0.7)', color: '#2c5f6e', outline: 'none' }} />
-            <select value={newTag} onChange={e => setNewTag(e.target.value)}
-              style={{ borderRadius: '0.75rem', padding: '0.5rem 0.6rem', fontSize: '0.85rem', border: '1px solid #b8dde8', background: 'rgba(255,255,255,0.7)', color: '#2c5f6e', outline: 'none' }}>
-              {Object.keys(tagColors).map(t => <option key={t}>{t}</option>)}
+
+          <div style={{display:'flex',gap:'0.5rem'}}>
+            <input type="text" value={newTodo} onChange={e=>setNewTodo(e.target.value)}
+              onKeyDown={e=>e.key==='Enter'&&addTodo()} placeholder="Neue Aufgabe..."
+              style={{flex:1,borderRadius:'0.75rem',padding:'0.5rem 0.9rem',fontSize:'0.85rem',
+                border:'1px solid #b8dde8',background:'rgba(255,255,255,0.7)',color:'#2c5f6e',outline:'none'}} />
+            <select value={newTag} onChange={e=>setNewTag(e.target.value)}
+              style={{borderRadius:'0.75rem',padding:'0.5rem 0.6rem',fontSize:'0.85rem',
+                border:'1px solid #b8dde8',background:'rgba(255,255,255,0.7)',color:'#2c5f6e',outline:'none'}}>
+              {Object.keys(tagColors).map(t=><option key={t}>{t}</option>)}
             </select>
-            <button onClick={addTodo} style={{ background: 'linear-gradient(135deg,#5bbfd4,#78c87a)', color: '#fff', border: 'none', borderRadius: '0.75rem', padding: '0.5rem 1rem', fontWeight: 600, cursor: 'pointer', fontSize: '1rem' }}>+</button>
+            <button onClick={addTodo}
+              style={{background:'linear-gradient(135deg,#5bbfd4,#78c87a)',color:'#fff',border:'none',
+                borderRadius:'0.75rem',padding:'0.5rem 1rem',fontWeight:700,cursor:'pointer',fontSize:'1rem'}}>+</button>
           </div>
         </div>
 
         {/* Right column */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+        <div style={{display:'flex',flexDirection:'column',gap:'1.25rem'}}>
+
+          {/* Quick Links */}
           <div style={card}>
-            <h2 style={{ color: '#2c5f6e', fontWeight: 600, fontSize: '1.05rem', marginTop: 0, marginBottom: '0.75rem' }}>🔗 Quick Links</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-              {quickLinks.map(link => (
+            <h2 style={{color:'#2c5f6e',fontWeight:600,fontSize:'1.05rem',marginBottom:'0.75rem'}}>🔗 Quick Links</h2>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.5rem'}}>
+              {quickLinks.map(link=>(
                 <a key={link.label} href={link.url} target="_blank" rel="noreferrer"
-                  style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(91,191,212,0.12)', border: '1px solid rgba(91,191,212,0.25)', borderRadius: '0.75rem', padding: '0.6rem 0.75rem', fontSize: '0.85rem', color: '#2c5f6e', textDecoration: 'none' }}>
+                  style={{display:'flex',alignItems:'center',gap:'0.4rem',
+                    background:'rgba(91,191,212,0.12)',border:'1px solid rgba(91,191,212,0.25)',
+                    borderRadius:'0.75rem',padding:'0.55rem 0.7rem',fontSize:'0.82rem',color:'#2c5f6e'}}>
                   <span>{link.emoji}</span><span>{link.label}</span>
                 </a>
               ))}
             </div>
           </div>
+
+          {/* Status */}
           <div style={card}>
-            <h2 style={{ color: '#2c5f6e', fontWeight: 600, fontSize: '1.05rem', marginTop: 0, marginBottom: '0.75rem' }}>📊 Status</h2>
-            {Object.keys(tagColors).map(tag => {
-              const count = todos.filter(t => t.tag === tag).length;
-              const doneCount = todos.filter(t => t.tag === tag && t.done).length;
+            <h2 style={{color:'#2c5f6e',fontWeight:600,fontSize:'1.05rem',marginBottom:'0.75rem'}}>📊 Status</h2>
+            {Object.keys(tagColors).map(tag=>{
+              const count=todos.filter(t=>t.tag===tag).length;
+              const doneCount=todos.filter(t=>t.tag===tag&&t.done).length;
               return (
-                <div key={tag} style={{ marginBottom: '0.6rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#7a9eaa', marginBottom: '0.2rem' }}>
+                <div key={tag} style={{marginBottom:'0.6rem'}}>
+                  <div style={{display:'flex',justifyContent:'space-between',fontSize:'0.75rem',color:'#7a9eaa',marginBottom:'0.2rem'}}>
                     <span>{tag}</span><span>{doneCount}/{count}</span>
                   </div>
-                  <div style={{ background: 'rgba(44,95,110,0.1)', borderRadius: '9999px', height: '6px' }}>
-                    <div style={{ background: 'linear-gradient(90deg,#5bbfd4,#78c87a)', height: '6px', borderRadius: '9999px', width: count > 0 ? `${Math.round((doneCount/count)*100)}%` : '0%', transition: 'width 0.5s' }} />
+                  <div style={{background:'rgba(44,95,110,0.1)',borderRadius:'9999px',height:'6px'}}>
+                    <div style={{background:'linear-gradient(90deg,#5bbfd4,#78c87a)',height:'6px',borderRadius:'9999px',
+                      width:count>0?`${Math.round((doneCount/count)*100)}%`:'0%',transition:'width 0.5s'}} />
                   </div>
                 </div>
               );
@@ -182,20 +664,25 @@ function Dashboard() {
           </div>
         </div>
 
-        {/* Notes – full width */}
-        <div style={{ ...card, gridColumn: '1 / -1' }}>
-          <h2 style={{ color: '#2c5f6e', fontWeight: 600, fontSize: '1.05rem', marginTop: 0, marginBottom: '0.75rem' }}>📝 Gespeichertes Wissen</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
-            {notes.map((note, i) => (
-              <div key={i} onClick={() => setExpandedNote(expandedNote === i ? null : i)}
-                style={{ background: 'rgba(91,191,212,0.08)', border: '1px solid rgba(91,191,212,0.25)', borderRadius: '0.75rem', padding: '0.85rem', cursor: 'pointer' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.3rem' }}>
-                  <span style={{ fontSize: '1.25rem' }}>{note.emoji}</span>
-                  <span style={{ fontWeight: 600, fontSize: '0.88rem', color: '#2c5f6e' }}>{note.title}</span>
+        {/* Knowledge Cards – full width */}
+        <div style={{...card,gridColumn:'1/-1'}}>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'0.75rem'}}>
+            <h2 style={{color:'#2c5f6e',fontWeight:600,fontSize:'1.05rem'}}>📝 Schnellwissen</h2>
+            <span style={{fontSize:'0.75rem',color:'#7a9eaa'}}>☰ Vollständiges Wissen im Menü</span>
+          </div>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'0.75rem'}}>
+            {knowledgeCards.map((note,i)=>(
+              <div key={i} onClick={()=>setExpandedNote(expandedNote===i?null:i)}
+                style={{background:'rgba(91,191,212,0.08)',border:'1px solid rgba(91,191,212,0.25)',
+                  borderRadius:'0.75rem',padding:'0.85rem',cursor:'pointer',transition:'all 0.2s'}}>
+                <div style={{display:'flex',alignItems:'center',gap:'0.5rem',marginBottom:'0.3rem'}}>
+                  <span style={{fontSize:'1.2rem'}}>{note.emoji}</span>
+                  <span style={{fontWeight:600,fontSize:'0.88rem',color:'#2c5f6e'}}>{note.title}</span>
                 </div>
-                {expandedNote === i
-                  ? <p style={{ color: '#5a8090', fontSize: '0.78rem', lineHeight: 1.6, margin: 0, whiteSpace: 'pre-line', borderTop: '1px solid rgba(91,191,212,0.3)', paddingTop: '0.5rem' }}>{note.body}</p>
-                  : <p style={{ color: '#aac8d0', fontSize: '0.75rem', margin: 0 }}>Klicken zum Öffnen →</p>
+                {expandedNote===i
+                  ? <pre style={{color:'#5a8090',fontSize:'0.78rem',lineHeight:1.6,margin:0,
+                      whiteSpace:'pre-wrap',fontFamily:'inherit',borderTop:'1px solid rgba(91,191,212,0.3)',paddingTop:'0.5rem'}}>{note.body}</pre>
+                  : <p style={{color:'#aac8d0',fontSize:'0.75rem',margin:0}}>Klicken zum Öffnen →</p>
                 }
               </div>
             ))}
